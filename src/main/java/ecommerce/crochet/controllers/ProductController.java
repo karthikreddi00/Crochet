@@ -1,8 +1,10 @@
 package ecommerce.crochet.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +21,7 @@ import ecommerce.crochet.service.ProductService;
 
 
 @RestController 
-@RequestMapping("/api")
+@RequestMapping("/product")
 public class ProductController {
          private final ProductService productService;
          
@@ -29,40 +31,45 @@ public class ProductController {
        
 
          //geting all products
-        @GetMapping("/products")
-        public List<Product> getProducts(){
-            return productService.getProducts();
+        @GetMapping
+        public ResponseEntity<List<Product>> getProducts(){
+            return ResponseEntity.ok(productService.getProducts());
         }
 
          //add product
-        @PostMapping("/products")
-        @ResponseStatus(HttpStatus.CREATED)
-        public void postproducts(@RequestBody Product product){
-             productService.addProduct(product);
+        @PostMapping
+        public ResponseEntity<Product> postproducts(@RequestBody Product product){
+             return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(productService.addProduct(product));
         }
 
            // get product by id
-        @GetMapping("/products/{id}")
-        public Product getProduct(@PathVariable Long id){
-            return productService.getProduct(id);
+        @GetMapping("/{id}")
+        public ResponseEntity<Product> getProduct(@PathVariable Long id){
+             Optional<Product> product = productService.getProduct(id);
+             if(product.isPresent())
+                return ResponseEntity.ok(product.get());
+            return ResponseEntity.notFound().build();
         }
 
         //search product by id
-        @GetMapping("/products/search")
-        public List<Product> searchProducts(@RequestParam String name){
-            return productService.searchProducts(name);
+        @GetMapping("/search")
+        public ResponseEntity<List<Product>> searchProducts(@RequestParam String name){
+            return ResponseEntity.ok(productService.searchProducts(name));
         }
 
         //updating product by id
-        @PutMapping("/products/{id}")
-        public void updateProduct(@RequestBody  Product product, @PathVariable Long id){
-             productService.updateProduct(product, id);
+        @PutMapping("/{id}")
+        public ResponseEntity<Product> updateProduct(@RequestBody  Product product, @PathVariable Long id){
+
+            return ResponseEntity.ok(productService.updateProduct(product, id));
         }
 
         //deleteing product by id
-        @DeleteMapping("/products/{id}")
-        @ResponseStatus(HttpStatus.NO_CONTENT)
-        public void deleteProduct(@PathVariable Long id){
+        @DeleteMapping("/{id}")
+        public ResponseEntity<Void> deleteProduct(@PathVariable Long id){
              productService.deleteProduct(id);
+             return ResponseEntity.noContent().build();
         }
 }

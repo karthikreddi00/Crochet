@@ -1,6 +1,7 @@
 package ecommerce.crochet.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -20,27 +21,26 @@ public class ProductService {
            return productRepository.findAll();
     }
 
-    public Product getProduct(Long id) {
-        return productRepository.findById(id)
-               .orElseThrow(() -> new RuntimeException("product not found"));
+    public Optional<Product> getProduct(Long id) {
+        return productRepository.findById(id);
     }
 
-    public void addProduct(Product product) {
-       productRepository.save(product);
+    public Product addProduct(Product product) {
+      return productRepository.save(product);
     }
 
     public List<Product> searchProducts(String name) {
         return productRepository.findByName(name);
     }
 
-    public void updateProduct(Product product, Long id) {
+    public Product updateProduct(Product product, Long id) {
          Product  modifiedProduct = productRepository.findById(id)
                                     .orElseThrow(() -> new RuntimeException("product not found"));
            modifiedProduct.setName(product.getName());
            modifiedProduct.setDescription(product.getDescription());
            modifiedProduct.setPrice(product.getPrice());
            modifiedProduct.setStock(product.getStock());
-           productRepository.save(modifiedProduct);
+          return productRepository.save(modifiedProduct);
     }
 
     public void deleteProduct(Long id) {
